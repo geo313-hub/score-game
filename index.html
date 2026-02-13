@@ -355,6 +355,14 @@
       transform: scale(1);
       transition: opacity .18s ease, filter .18s ease, transform .18s ease;
     }
+
+    /* ✅ 修正：讓 glow/total 的 ::before 不要擋住輸入框與按鈕點擊 */
+.glowA::before,
+.glowB::before,
+.totalA::before,
+.totalB::before{
+  pointer-events: none;
+}
   </style>
 </head>
 <body>
@@ -838,7 +846,7 @@
       setStatus(`🎉 ${nameB} 逆轉勝利！`, 'good');
       clutchSound();
     } else {
-      setStatus(`🤝 平手！再來一局～`, 'warn');
+      setStatus(`🤝 平手！本局不計勝負，直接進入下一局。`, 'warn');
       tieSound();
     }
 
@@ -1088,4 +1096,5 @@
 })();
 </script>
 </body>
+
 </html>
