@@ -1,0 +1,1091 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>逗陣一傢伙仔-春節比大小</title>
+  <style>
+    :root{
+      --bg1:#0b1020;
+      --bg2:#0b1b3a;
+      --card:#101a33cc;
+      --border:#ffffff1f;
+      --text:#f5f7ff;
+      --muted:#b9c0d6;
+      --accent:#7c5cff;
+      --good:#28d17c;
+      --warn:#ffcf5a;
+      --bad:#ff5c7a;
+      --shadow: 0 18px 55px rgba(0,0,0,.35);
+      --radius: 26px;
+
+      --teamA:#58a6ff;
+      --teamB:#ff7aa2;
+    }
+
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      color:var(--text);
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Noto Sans TC", Arial, sans-serif;
+      background:
+        radial-gradient(1200px 800px at 15% 20%, #2a2aa0 0%, transparent 60%),
+        radial-gradient(900px 700px at 80% 30%, #6d1dd1 0%, transparent 62%),
+        linear-gradient(160deg, var(--bg1), var(--bg2));
+      min-height:100vh;
+      overflow-x:hidden;
+    }
+
+    .wrap{ max-width: 1400px; margin:0 auto; padding: 22px 18px 30px; }
+
+    header{
+      display:flex; align-items:center; justify-content:space-between; gap:16px; margin-bottom: 14px;
+    }
+    .title{ display:flex; flex-direction:column; gap:6px; }
+    .title h1{ margin:0; font-size: clamp(22px, 2.4vw, 34px); letter-spacing:.5px; }
+    .title .sub{ color:var(--muted); font-size: 14px; line-height:1.3; }
+
+    .top-actions{ display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end; }
+
+    .btn{
+      appearance:none;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.06);
+      color: var(--text);
+      padding: 10px 14px;
+      border-radius: 14px;
+      cursor:pointer;
+      font-weight: 900;
+      letter-spacing:.3px;
+      transition: transform .08s ease, background .18s ease, border-color .18s ease;
+      user-select:none;
+      white-space:nowrap;
+    }
+    .btn:hover{ background: rgba(255,255,255,0.10); border-color: rgba(255,255,255,0.22); }
+    .btn:active{ transform: translateY(1px) scale(.99); }
+    .btn.primary{
+      background: linear-gradient(135deg, rgba(124,92,255,.95), rgba(173,92,255,.88));
+      border-color: transparent;
+      box-shadow: 0 14px 32px rgba(124,92,255,.25);
+    }
+    .btn.danger{ background: rgba(255,92,122,.12); border-color: rgba(255,92,122,.25); }
+    .btn.ghost{ background: transparent; }
+
+    .panel{ margin-top: 10px; display:grid; grid-template-columns: 1fr; gap: 14px; }
+    .board{ display:grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+    .card{
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 18px 16px;
+      position:relative;
+      overflow:hidden;
+      backdrop-filter: blur(10px);
+    }
+
+    .pill{
+      display:inline-flex; align-items:center; gap:8px;
+      padding: 8px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.06);
+      color: var(--muted);
+      font-weight: 900;
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    .meta{
+      display:flex; flex-wrap:wrap; gap:10px;
+      justify-content:space-between; align-items:center;
+    }
+    .meta-left, .meta-right{
+      display:flex; flex-wrap:wrap; gap:10px; align-items:center;
+    }
+
+    .select{
+      display:flex; align-items:center; gap:8px;
+      padding: 10px 12px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.06);
+      color: var(--text);
+      font-weight: 950;
+    }
+    select{
+      border:none; outline:none; background: transparent; color: var(--text);
+      font-weight: 950; cursor:pointer; font-size: 14px;
+    }
+    option{ color:#111; }
+
+    .team-head{
+      display:flex; justify-content:space-between; align-items:flex-start;
+      gap:10px; margin-bottom: 12px;
+    }
+    .team-name{ display:flex; flex-direction:column; gap:6px; min-width: 180px; }
+    .team-name input{
+      width: 220px; max-width: 52vw;
+      font-size: 18px; font-weight: 1000;
+      padding: 8px 10px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: rgba(0,0,0,.18);
+      color: var(--text);
+      outline:none;
+    }
+    .team-name input:focus{
+      border-color: rgba(124,92,255,.55);
+      box-shadow: 0 0 0 4px rgba(124,92,255,.18);
+    }
+
+    .color-row{
+      display:flex; align-items:center; gap:10px;
+      margin-top: 4px; color:var(--muted);
+      font-size: 12px; font-weight: 900;
+    }
+    input[type="color"]{ width: 44px; height: 30px; border:none; background: transparent; cursor:pointer; }
+
+    .score{
+      font-size: clamp(86px, 8.8vw, 180px);
+      font-weight: 1100;
+      line-height: .95;
+      letter-spacing: -2px;
+      text-align:center;
+      margin: 16px 0 10px;
+      text-shadow: 0 20px 55px rgba(0,0,0,.35);
+    }
+    .score.roll{ animation: pop .18s ease; }
+    @keyframes pop{
+      0%{ transform: scale(.98); opacity:.85; }
+      100%{ transform: scale(1); opacity:1; }
+    }
+
+    .glowA::before, .glowB::before{
+      content:"";
+      position:absolute; inset:-40%;
+      opacity:.18; filter: blur(30px);
+      transform: rotate(8deg);
+    }
+    .glowA::before{ background: radial-gradient(circle, var(--teamA), transparent 55%); }
+    .glowB::before{ background: radial-gradient(circle, var(--teamB), transparent 55%); }
+
+    .team-actions{
+      display:flex; gap:10px; justify-content:center;
+      flex-wrap:wrap; margin-top: 12px;
+    }
+    .big-actions{
+      display:flex; gap:10px; flex-wrap:wrap; justify-content:center;
+    }
+
+    .status{
+      text-align:center;
+      font-size: clamp(20px, 2.3vw, 34px);
+      font-weight: 1100;
+      margin: 10px 0 0;
+    }
+    .status.good{ color: var(--good); }
+    .status.warn{ color: var(--warn); }
+    .status.bad{ color: var(--bad); }
+
+    .hint{
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.4;
+      text-align:center;
+      margin-top: 10px;
+    }
+    .kbd{
+      display:inline-flex; align-items:center; justify-content:center;
+      padding: 2px 8px;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.18);
+      background: rgba(0,0,0,.18);
+      color: var(--text);
+      font-weight: 1000;
+      font-size: 12px;
+      margin: 0 3px;
+    }
+
+    .grid2{
+      display:grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap: 14px;
+      margin-top: 14px;
+    }
+
+    .log{
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      font-size: 13px;
+      color: var(--muted);
+      max-height: 260px;
+      overflow:auto;
+      padding-right:6px;
+    }
+    .log .row{
+      padding: 10px 10px;
+      border-bottom: 1px dashed rgba(255,255,255,0.12);
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      align-items:flex-start;
+    }
+    .log .row strong{ color: var(--text); }
+    .log .row:last-child{ border-bottom: none; }
+
+    .scoreboard{ display:flex; flex-direction:column; gap:12px; }
+    .totals{ display:grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+    .total{
+      border: 1px solid var(--border);
+      background: rgba(0,0,0,.16);
+      border-radius: 18px;
+      padding: 12px 12px;
+      text-align:center;
+      position:relative;
+      overflow:hidden;
+    }
+    .totalA::before, .totalB::before{
+      content:"";
+      position:absolute;
+      inset:-40%;
+      opacity:.12;
+      filter: blur(28px);
+    }
+    .totalA::before{ background: radial-gradient(circle, var(--teamA), transparent 60%); }
+    .totalB::before{ background: radial-gradient(circle, var(--teamB), transparent 60%); }
+
+    .total .label{ position:relative; color: var(--muted); font-weight: 1100; font-size: 13px; margin-bottom: 6px; }
+    .total .val{ position:relative; font-size: 48px; font-weight: 1200; letter-spacing:-1px; }
+
+    /* Countdown overlay */
+    .overlay{
+      position: fixed; inset:0;
+      display:none; align-items:center; justify-content:center;
+      background: rgba(0,0,0,.55);
+      backdrop-filter: blur(8px);
+      z-index: 9999;
+    }
+    .overlay.show{ display:flex; }
+    .countbox{
+      text-align:center;
+      padding: 22px 28px;
+      border-radius: 28px;
+      border: 1px solid rgba(255,255,255,.18);
+      background: rgba(16,26,51,.62);
+      box-shadow: 0 25px 80px rgba(0,0,0,.45);
+      min-width: min(650px, 92vw);
+    }
+    .count-num{
+      font-size: clamp(86px, 12vw, 160px);
+      font-weight: 1300;
+      letter-spacing: -2px;
+      margin: 4px 0;
+      text-shadow: 0 25px 80px rgba(0,0,0,.55);
+    }
+    .count-sub{
+      color: var(--muted);
+      font-weight: 1100;
+      margin-top: 6px;
+      font-size: clamp(14px, 1.6vw, 20px);
+      line-height: 1.35;
+      white-space: pre-line;
+    }
+
+    /* Champion screen */
+    .champ{
+      position: fixed; inset:0;
+      display:none; z-index: 10000;
+      align-items:center; justify-content:center;
+      background:
+        radial-gradient(1200px 800px at 20% 20%, rgba(124,92,255,.38), transparent 60%),
+        radial-gradient(900px 700px at 80% 30%, rgba(255,122,162,.28), transparent 62%),
+        rgba(0,0,0,.65);
+      backdrop-filter: blur(10px);
+      text-align:center;
+      padding: 22px;
+    }
+    .champ.show{ display:flex; }
+    .champ-card{
+      border-radius: 30px;
+      border: 1px solid rgba(255,255,255,.18);
+      background: rgba(16,26,51,.68);
+      box-shadow: 0 25px 90px rgba(0,0,0,.55);
+      padding: 26px 26px 22px;
+      width: min(900px, 94vw);
+    }
+    .champ-title{ font-size: clamp(20px, 2.2vw, 30px); color: var(--muted); font-weight: 1200; margin-bottom: 10px; }
+    .champ-name{
+      font-size: clamp(44px, 6vw, 92px);
+      font-weight: 1300;
+      line-height: 1.05;
+      margin: 6px 0 10px;
+      text-shadow: 0 30px 90px rgba(0,0,0,.55);
+    }
+    .champ-meta{ font-weight: 1100; color: var(--muted); margin-bottom: 16px; }
+    .champ-actions{ display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-top: 12px; }
+
+    canvas#confetti{
+      position: fixed; inset:0;
+      pointer-events:none;
+      z-index: 10001;
+      display:none;
+    }
+    canvas#confetti.show{ display:block; }
+
+    @media (max-width: 980px){
+      .board{ grid-template-columns: 1fr; }
+      .grid2{ grid-template-columns: 1fr; }
+      .team-name input{ width: 100%; }
+    }
+
+    .fullscreen .wrap{ max-width: 1600px; }
+
+    /* ✅ 淡出提示：等待抽分時，上一局分數顯示但變灰 */
+    .score.faded{
+      opacity: .38;
+      filter: grayscale(1) saturate(.2);
+      transform: scale(.985);
+      transition: opacity .25s ease, filter .25s ease, transform .25s ease;
+    }
+    .score.live{
+      opacity: 1;
+      filter: none;
+      transform: scale(1);
+      transition: opacity .18s ease, filter .18s ease, transform .18s ease;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap" id="root">
+    <header>
+      <div class="title">
+        <h1>逗陣一傢伙仔-春節比大小</h1>
+        <div class="sub">倒數後 A 先揭曉 → 懸念停頓 → B 揭曉；新局未抽會保留上一局分數並淡出提示。</div>
+      </div>
+      <div class="top-actions">
+        <button class="btn" id="btnFullscreen">投影全螢幕 (F)</button>
+        <button class="btn danger" id="btnResetAll">全部重置</button>
+      </div>
+    </header>
+
+    <div class="panel card">
+      <div class="meta">
+        <div class="meta-left">
+          <div class="select">
+            分數範圍：
+            <select id="rangeSelect">
+              <option value="10" selected>1 ~ 10</option>
+              <option value="20">1 ~ 20</option>
+              <option value="100">1 ~ 100</option>
+            </select>
+          </div>
+
+          <div class="select">
+            局數制：
+            <select id="roundsSelect">
+              <option value="3">三局兩勝</option>
+              <option value="5" selected>五局三勝</option>
+              <option value="7">七局四勝</option>
+            </select>
+          </div>
+
+          <span class="pill">目前局數：<strong id="roundNow" style="color:var(--text)">1</strong>/<span id="roundMax">5</span></span>
+          <span class="pill">狀態：<strong id="gameState" style="color:var(--text)">等待抽分</strong></span>
+        </div>
+
+        <div class="meta-right big-actions">
+          <button class="btn primary" id="btnDrawBoth">春節比大小（A先揭曉） (Enter/Space/PgDn)</button>
+          <button class="btn" id="btnResetRound">重置本局 (R)</button>
+        </div>
+      </div>
+
+      <div class="board" style="margin-top:14px;">
+        <!-- Team A -->
+        <div class="card glowA" style="margin:0;">
+          <div class="team-head">
+            <div class="team-name">
+              <div class="pill">隊伍 A</div>
+              <input id="nameA" value="隊伍 A" aria-label="隊伍A名稱" />
+              <div class="color-row">
+                <span>顏色</span>
+                <input type="color" id="colorA" value="#58a6ff" aria-label="隊伍A顏色" />
+              </div>
+            </div>
+            <div class="pill">本局分數</div>
+          </div>
+
+          <div class="score faded" id="scoreA" style="color:var(--teamA)">0</div>
+
+          <div class="team-actions">
+            <button class="btn" id="btnDrawA">只抽 A（快速揭曉）</button>
+          </div>
+        </div>
+
+        <!-- Team B -->
+        <div class="card glowB" style="margin:0;">
+          <div class="team-head">
+            <div class="team-name">
+              <div class="pill">隊伍 B</div>
+              <input id="nameB" value="隊伍 B" aria-label="隊伍B名稱" />
+              <div class="color-row">
+                <span>顏色</span>
+                <input type="color" id="colorB" value="#ff7aa2" aria-label="隊伍B顏色" />
+              </div>
+            </div>
+            <div class="pill">本局分數</div>
+          </div>
+
+          <div class="score faded" id="scoreB" style="color:var(--teamB)">0</div>
+
+          <div class="team-actions">
+            <button class="btn" id="btnDrawB">只抽 B（快速揭曉）</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="status" id="statusText" style="margin-top:14px;">準備開始！按「春節比大小」</div>
+      <div class="hint">
+        快捷鍵：<span class="kbd">F</span>全螢幕｜
+        <span class="kbd">Enter</span>/<span class="kbd">Space</span>/<span class="kbd">PageDown</span>抽分｜
+        <span class="kbd">R</span>重置本局｜
+        <span class="kbd">Esc</span>關閉冠軍畫面
+      </div>
+    </div>
+
+    <div class="grid2">
+      <div class="card">
+        <div class="meta" style="margin-bottom:12px;">
+          <div class="pill">歷史紀錄</div>
+          <button class="btn ghost" id="btnClearLog">清除紀錄</button>
+        </div>
+        <div class="log" id="log"></div>
+      </div>
+
+      <div class="card scoreboard">
+        <div class="pill">總比分（勝局數）</div>
+        <div class="totals">
+          <div class="total totalA">
+            <div class="label" id="totalLabelA">隊伍 A</div>
+            <div class="val" id="totalA">0</div>
+          </div>
+          <div class="total totalB">
+            <div class="label" id="totalLabelB">隊伍 B</div>
+            <div class="val" id="totalB">0</div>
+          </div>
+        </div>
+
+        <div class="pill">規則</div>
+        <div style="color:var(--muted); font-weight:1100; line-height:1.6;">
+          - 懸念模式：A 先揭曉 → 等待 → B 再揭曉<br/>
+          - 新局未抽：分數保留但淡出提示<br/>
+          - 平手：不加勝局；達勝局門檻即奪冠
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Countdown overlay -->
+  <div class="overlay" id="countOverlay" aria-hidden="true">
+    <div class="countbox">
+      <div class="count-num" id="countNum">3</div>
+      <div class="count-sub" id="countSub">準備抽分…</div>
+    </div>
+  </div>
+
+  <!-- Champion screen -->
+  <div class="champ" id="champScreen" aria-hidden="true">
+    <div class="champ-card">
+      <div class="champ-title">🏆 冠軍誕生</div>
+      <div class="champ-name" id="champName">隊伍 A</div>
+      <div class="champ-meta" id="champMeta">最終比分：0 - 0</div>
+      <div class="champ-actions">
+        <button class="btn primary" id="btnPlayAgain">再來一場</button>
+        <button class="btn" id="btnCloseChamp">關閉</button>
+      </div>
+      <div class="hint" style="margin-top:14px;">
+        提示：你也可以按 <span class="kbd">Esc</span> 關閉
+      </div>
+    </div>
+  </div>
+
+  <!-- Confetti canvas -->
+  <canvas id="confetti"></canvas>
+
+<script>
+(() => {
+  // ---------- DOM ----------
+  const scoreAEl = document.getElementById('scoreA');
+  const scoreBEl = document.getElementById('scoreB');
+
+  const nameAEl  = document.getElementById('nameA');
+  const nameBEl  = document.getElementById('nameB');
+
+  const colorAEl = document.getElementById('colorA');
+  const colorBEl = document.getElementById('colorB');
+
+  const btnDrawBoth   = document.getElementById('btnDrawBoth');
+  const btnDrawA      = document.getElementById('btnDrawA');
+  const btnDrawB      = document.getElementById('btnDrawB');
+  const btnResetRound = document.getElementById('btnResetRound');
+  const btnResetAll   = document.getElementById('btnResetAll');
+  const btnClearLog   = document.getElementById('btnClearLog');
+  const btnFullscreen = document.getElementById('btnFullscreen');
+
+  const rangeSelect  = document.getElementById('rangeSelect');
+  const roundsSelect = document.getElementById('roundsSelect');
+
+  const statusText = document.getElementById('statusText');
+  const logEl = document.getElementById('log');
+
+  const totalAEl = document.getElementById('totalA');
+  const totalBEl = document.getElementById('totalB');
+  const totalLabelA = document.getElementById('totalLabelA');
+  const totalLabelB = document.getElementById('totalLabelB');
+
+  const roundNowEl = document.getElementById('roundNow');
+  const roundMaxEl = document.getElementById('roundMax');
+  const gameStateEl = document.getElementById('gameState');
+
+  const countOverlay = document.getElementById('countOverlay');
+  const countNum = document.getElementById('countNum');
+  const countSub = document.getElementById('countSub');
+
+  const champScreen = document.getElementById('champScreen');
+  const champName = document.getElementById('champName');
+  const champMeta = document.getElementById('champMeta');
+  const btnPlayAgain = document.getElementById('btnPlayAgain');
+  const btnCloseChamp = document.getElementById('btnCloseChamp');
+
+  const confettiCanvas = document.getElementById('confetti');
+  const ctxConf = confettiCanvas.getContext('2d');
+
+  // ---------- State ----------
+  let min = 1;
+  let max = Number(rangeSelect.value);
+
+  let maxRounds = Number(roundsSelect.value);
+  let winNeed = Math.floor(maxRounds / 2) + 1;
+
+  let round = 1;
+
+  // ✅ 用 null 代表「本局尚未抽分」，不改畫面分數
+  let scoreA = null;
+  let scoreB = null;
+
+  let winsA = 0;
+  let winsB = 0;
+
+  let isBusy = false;
+  let gameOver = false;
+
+  const GAP_AFTER_A_REVEAL = 800;
+  const ROLL_A_MS = 900;
+  const ROLL_B_MS = 980;
+
+  // ---------- Sound (WebAudio) ----------
+  let audioCtx = null;
+  function ensureAudio(){
+    if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }
+  function beep(freq=440, dur=0.08, type='sine', gain=0.06){
+    ensureAudio();
+    const t = audioCtx.currentTime;
+    const o = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    o.type = type;
+    o.frequency.setValueAtTime(freq, t);
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(gain, t + 0.01);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    o.connect(g); g.connect(audioCtx.destination);
+    o.start(t);
+    o.stop(t + dur + 0.02);
+  }
+  function tickSound(){ beep(520, 0.06, 'square', 0.04); }
+  function revealA(){ beep(880, 0.12, 'triangle', 0.07); }
+  function revealB(){ beep(980, 0.14, 'triangle', 0.08); }
+  function winSound(){
+    beep(784, 0.10, 'triangle', 0.07);
+    setTimeout(()=>beep(988, 0.12, 'triangle', 0.07), 90);
+  }
+  function tieSound(){ beep(350, 0.14, 'sine', 0.055); }
+  function endSound(){
+    beep(523, 0.12, 'triangle', 0.08);
+    setTimeout(()=>beep(659, 0.12, 'triangle', 0.08), 110);
+    setTimeout(()=>beep(784, 0.18, 'triangle', 0.09), 230);
+  }
+  function clutchSound(){
+    beep(1046, 0.08, 'square', 0.07);
+    setTimeout(()=>beep(1318, 0.10, 'square', 0.07), 80);
+    setTimeout(()=>beep(1568, 0.12, 'square', 0.07), 180);
+  }
+
+  // ---------- Helpers ----------
+  const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+  function randInt(min, max){ return Math.floor(Math.random() * (max - min + 1)) + min; }
+
+  function setStatus(text, tone=''){
+    statusText.className = 'status' + (tone ? ` ${tone}` : '');
+    statusText.textContent = text;
+  }
+
+  function syncTeamColors(){
+    document.documentElement.style.setProperty('--teamA', colorAEl.value);
+    document.documentElement.style.setProperty('--teamB', colorBEl.value);
+    scoreAEl.style.color = 'var(--teamA)';
+    scoreBEl.style.color = 'var(--teamB)';
+  }
+
+  function syncLabels(){
+    totalLabelA.textContent = nameAEl.value.trim() || '隊伍 A';
+    totalLabelB.textContent = nameBEl.value.trim() || '隊伍 B';
+  }
+
+  function syncRoundUI(){
+    roundNowEl.textContent = String(round);
+    roundMaxEl.textContent = String(maxRounds);
+    gameStateEl.textContent = gameOver ? '比賽結束' : (isBusy ? '進行中' : '等待抽分');
+    totalAEl.textContent = String(winsA);
+    totalBEl.textContent = String(winsB);
+  }
+
+  function lockUI(locked){
+    const els = [btnDrawBoth, btnDrawA, btnDrawB, btnResetRound, btnResetAll, btnClearLog, rangeSelect, roundsSelect, nameAEl, nameBEl, colorAEl, colorBEl];
+    els.forEach(el => el.disabled = locked);
+    [btnDrawBoth, btnDrawA, btnDrawB, btnResetRound].forEach(b => b.style.opacity = locked ? .65 : 1);
+  }
+
+  // ✅ 淡出提示控制
+  function setScoreVisualState(state){
+    scoreAEl.classList.remove('faded','live');
+    scoreBEl.classList.remove('faded','live');
+    scoreAEl.classList.add(state);
+    scoreBEl.classList.add(state);
+  }
+
+  function addLogRow({ round, a, b, winner }){
+    const nameA = nameAEl.value.trim() || '隊伍 A';
+    const nameB = nameBEl.value.trim() || '隊伍 B';
+
+    const winnerText =
+      winner === 'A' ? `🏆 ${nameA}` :
+      winner === 'B' ? `🏆 ${nameB}` : '🤝 平手';
+
+    const row = document.createElement('div');
+    row.className = 'row';
+    row.innerHTML = `
+      <div>
+        <strong>第 ${round} 局</strong>　${nameA}: ${a} ｜ ${nameB}: ${b}<br/>
+        <span style="opacity:.92">${winnerText}</span>
+      </div>
+      <div style="opacity:.8">${new Date().toLocaleTimeString('zh-TW', {hour:'2-digit', minute:'2-digit', second:'2-digit'})}</div>
+    `;
+    logEl.prepend(row);
+  }
+
+  function animateRoll(scoreEl, finalValue, duration=900, tickProb=0.25){
+    const start = performance.now();
+    const tick = (now) => {
+      const t = (now - start) / duration;
+      if(t < 1){
+        scoreEl.textContent = String(randInt(min, max));
+        scoreEl.classList.add('roll');
+        if(Math.random() < tickProb) beep(560, 0.05, 'square', 0.03);
+        requestAnimationFrame(tick);
+      } else {
+        scoreEl.textContent = String(finalValue);
+        setTimeout(()=>scoreEl.classList.remove('roll'), 120);
+      }
+    };
+    requestAnimationFrame(tick);
+  }
+
+  // ---------- Countdown ----------
+  async function countdownSuspense(hint){
+    countOverlay.classList.add('show');
+    countOverlay.setAttribute('aria-hidden','false');
+
+    countSub.textContent = hint ? hint : '準備抽分…';
+
+    for(let s=3; s>=1; s--){
+      countNum.textContent = String(s);
+      tickSound();
+      await sleep(650);
+    }
+    countNum.textContent = 'GO!';
+    beep(980, 0.10, 'triangle', 0.08);
+    await sleep(260);
+
+    countOverlay.classList.remove('show');
+    countOverlay.setAttribute('aria-hidden','true');
+  }
+
+  // ---------- Confetti ----------
+  let confettiRunning = false;
+  let confettiPieces = [];
+  let confettiRAF = null;
+
+  function resizeConfetti(){
+    confettiCanvas.width = window.innerWidth * devicePixelRatio;
+    confettiCanvas.height = window.innerHeight * devicePixelRatio;
+    ctxConf.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);
+  }
+
+  function startConfetti(durationMs=5600){
+    resizeConfetti();
+    confettiPieces = [];
+    const W = window.innerWidth;
+    const H = window.innerHeight;
+    const colors = [colorAEl.value, colorBEl.value, '#ffffff', '#ffd56a', '#7c5cff'];
+
+    for(let i=0;i<200;i++){
+      confettiPieces.push({
+        x: Math.random()*W,
+        y: -20 - Math.random()*H*0.2,
+        w: 6 + Math.random()*8,
+        h: 10 + Math.random()*14,
+        vy: 2 + Math.random()*5,
+        vx: -2 + Math.random()*4,
+        rot: Math.random()*Math.PI,
+        vr: -0.12 + Math.random()*0.24,
+        color: colors[Math.floor(Math.random()*colors.length)],
+        alpha: 0.92
+      });
+    }
+
+    confettiRunning = true;
+    confettiCanvas.classList.add('show');
+
+    const start = performance.now();
+    const loop = (now) => {
+      const t = now - start;
+      ctxConf.clearRect(0,0,window.innerWidth, window.innerHeight);
+
+      for(const p of confettiPieces){
+        p.x += p.vx;
+        p.y += p.vy;
+        p.rot += p.vr;
+        p.vy += 0.02;
+        if(p.y > H + 30){
+          p.y = -20;
+          p.x = Math.random()*W;
+          p.vy = 2 + Math.random()*5;
+        }
+
+        ctxConf.save();
+        ctxConf.globalAlpha = p.alpha;
+        ctxConf.translate(p.x, p.y);
+        ctxConf.rotate(p.rot);
+        ctxConf.fillStyle = p.color;
+        ctxConf.fillRect(-p.w/2, -p.h/2, p.w, p.h);
+        ctxConf.restore();
+      }
+
+      if(t < durationMs && confettiRunning){
+        confettiRAF = requestAnimationFrame(loop);
+      }else{
+        stopConfetti();
+      }
+    };
+    confettiRAF = requestAnimationFrame(loop);
+  }
+
+  function stopConfetti(){
+    confettiRunning = false;
+    if(confettiRAF) cancelAnimationFrame(confettiRAF);
+    ctxConf.clearRect(0,0,window.innerWidth, window.innerHeight);
+    confettiCanvas.classList.remove('show');
+  }
+
+  window.addEventListener('resize', () => { if(confettiRunning) resizeConfetti(); });
+
+  // ---------- Champion Screen ----------
+  function showChampion(winnerName){
+    champName.textContent = winnerName;
+    champMeta.textContent = `最終比分：${winsA} - ${winsB}`;
+    champScreen.classList.add('show');
+    champScreen.setAttribute('aria-hidden','false');
+    startConfetti(5600);
+  }
+  function hideChampion(){
+    champScreen.classList.remove('show');
+    champScreen.setAttribute('aria-hidden','true');
+    stopConfetti();
+  }
+
+  // ---------- Game Logic ----------
+  function evaluateRound(){
+    if(scoreA === null || scoreB === null) return;
+
+    const nameA = nameAEl.value.trim() || '隊伍 A';
+    const nameB = nameBEl.value.trim() || '隊伍 B';
+
+    let winner = 'TIE';
+    if(scoreA > scoreB) winner = 'A';
+    else if(scoreB > scoreA) winner = 'B';
+
+    // ✅ 揭曉後保持亮
+    setScoreVisualState('live');
+
+    if(winner === 'A'){
+      winsA++;
+      setStatus(`🎉 ${nameA} 本局勝利！`, 'good');
+      winSound();
+    } else if(winner === 'B'){
+      winsB++;
+      setStatus(`🎉 ${nameB} 逆轉勝利！`, 'good');
+      clutchSound();
+    } else {
+      setStatus(`🤝 平手！再來一局～`, 'warn');
+      tieSound();
+    }
+
+    addLogRow({ round, a: scoreA, b: scoreB, winner });
+    syncRoundUI();
+    checkGameOverOrNext();
+  }
+
+  function checkGameOverOrNext(){
+    if(winsA >= winNeed || winsB >= winNeed){
+      gameOver = true;
+      const nameA = nameAEl.value.trim() || '隊伍 A';
+      const nameB = nameBEl.value.trim() || '隊伍 B';
+      const champ = winsA > winsB ? nameA : nameB;
+
+      setStatus(`🏆 比賽結束：${champ} 奪冠！`, 'good');
+      endSound();
+      syncRoundUI();
+
+      showChampion(champ);
+      lockUI(true);
+      return;
+    }
+
+    if(round < maxRounds){
+      round++;
+
+      // ✅ 只清本局狀態，不改畫面分數
+      scoreA = null;
+      scoreB = null;
+
+      // ✅ 新局未抽 -> 淡出提示
+      setScoreVisualState('faded');
+
+      setStatus(`第 ${round} 局準備！按「春節比大小」`, '');
+      syncRoundUI();
+    } else {
+      gameOver = true;
+      setStatus('比賽結束（局數已滿）', 'warn');
+      lockUI(true);
+      syncRoundUI();
+    }
+  }
+
+  async function drawBothSuspense(){
+    if(isBusy || gameOver) return;
+    isBusy = true;
+    syncRoundUI();
+    lockUI(true);
+
+    ensureAudio();
+
+    // ✅ 抽分開始 -> 亮起
+    setScoreVisualState('live');
+
+    // 先決定分數（但還不揭露）
+    const a = randInt(min, max);
+    const b = randInt(min, max);
+
+    const need = a + 1;
+    const nameA = nameAEl.value.trim() || '隊伍 A';
+    const nameB = nameBEl.value.trim() || '隊伍 B';
+
+    let hint = '準備抽分…';
+    if(need <= max){
+      hint = `懸念提示：${nameA} 先揭曉。\n${nameB} 需要 ≥ ${need} 才能贏！`;
+    } else {
+      hint = `懸念提示：${nameA} 抽到很高，${nameB} 可能很難逆轉…`;
+    }
+
+    await countdownSuspense(hint);
+
+    // A 先揭曉
+    setStatus(`🎯 ${nameA} 先揭曉…`, 'warn');
+    scoreA = a;
+    animateRoll(scoreAEl, a, ROLL_A_MS, 0.26);
+    await sleep(ROLL_A_MS + 60);
+    revealA();
+
+    // 懸念停頓
+    setStatus(
+      (need <= max) ? `😈 懸念：${nameB} 需要 ≥ ${need} 才能贏！` : `😈 懸念：${nameB} 必須抽到最高才有機會！`,
+      'warn'
+    );
+    await sleep(GAP_AFTER_A_REVEAL);
+
+    // B 再揭曉
+    setStatus(`🔥 輪到 ${nameB}…`, 'warn');
+    scoreB = b;
+    animateRoll(scoreBEl, b, ROLL_B_MS, 0.30);
+    await sleep(ROLL_B_MS + 60);
+    revealB();
+
+    isBusy = false;
+    lockUI(false);
+    syncRoundUI();
+    evaluateRound();
+  }
+
+  async function drawSingle(team){
+    if(isBusy || gameOver) return;
+    isBusy = true;
+    syncRoundUI();
+    lockUI(true);
+
+    ensureAudio();
+    setScoreVisualState('live');
+
+    await countdownSuspense('快速揭曉…');
+
+    const val = randInt(min, max);
+    if(team === 'A'){
+      scoreA = val;
+      animateRoll(scoreAEl, val, 760, 0.22);
+      await sleep(820);
+      revealA();
+    } else {
+      scoreB = val;
+      animateRoll(scoreBEl, val, 760, 0.22);
+      await sleep(820);
+      revealB();
+    }
+
+    isBusy = false;
+    lockUI(false);
+    syncRoundUI();
+
+    if(scoreA !== null && scoreB !== null) evaluateRound();
+    else {
+      // 尚未兩邊都抽完：保持亮或你也可以改成半亮
+      setStatus('另一隊還沒抽分數～', 'warn');
+    }
+  }
+
+  function resetRound(){
+    if(isBusy) return;
+
+    // ✅ 重置本局：清狀態，不改畫面分數
+    scoreA = null;
+    scoreB = null;
+
+    // ✅ 新局未抽：淡出提示
+    setScoreVisualState('faded');
+
+    setStatus(`本局已重置（分數保留畫面），按「春節比大小」開始本局`, '');
+    syncRoundUI();
+  }
+
+  function resetAll(){
+    if(isBusy) return;
+    hideChampion();
+
+    round = 1;
+    winsA = 0; winsB = 0;
+    gameOver = false;
+
+    // ✅ 全部重置才把畫面清回 0
+    scoreA = null;
+    scoreB = null;
+    scoreAEl.textContent = '0';
+    scoreBEl.textContent = '0';
+
+    logEl.innerHTML = '';
+    lockUI(false);
+
+    setScoreVisualState('faded');
+    setStatus('準備開始！按「春節比大小」', '');
+    syncRoundUI();
+  }
+
+  function clearLog(){ logEl.innerHTML = ''; }
+
+  async function toggleFullscreen(){
+    try{
+      if(!document.fullscreenElement){
+        await document.documentElement.requestFullscreen();
+        document.body.classList.add('fullscreen');
+        btnFullscreen.textContent = '離開全螢幕 (Esc)';
+      }else{
+        await document.exitFullscreen();
+      }
+    }catch(e){}
+  }
+
+  // ---------- Events ----------
+  btnDrawBoth.addEventListener('click', drawBothSuspense);
+  btnDrawA.addEventListener('click', () => drawSingle('A'));
+  btnDrawB.addEventListener('click', () => drawSingle('B'));
+
+  btnResetRound.addEventListener('click', resetRound);
+  btnResetAll.addEventListener('click', resetAll);
+  btnClearLog.addEventListener('click', clearLog);
+  btnFullscreen.addEventListener('click', toggleFullscreen);
+
+  btnPlayAgain.addEventListener('click', () => { hideChampion(); resetAll(); });
+  btnCloseChamp.addEventListener('click', hideChampion);
+
+  nameAEl.addEventListener('input', syncLabels);
+  nameBEl.addEventListener('input', syncLabels);
+
+  colorAEl.addEventListener('input', syncTeamColors);
+  colorBEl.addEventListener('input', syncTeamColors);
+
+  rangeSelect.addEventListener('change', () => {
+    max = Number(rangeSelect.value);
+    // 不清畫面分數，只把本局狀態視為未抽，並淡出
+    scoreA = null; scoreB = null;
+    setScoreVisualState('faded');
+    setStatus(`分數範圍已切換為 1~${max}，按「春節比大小」開始`, '');
+  });
+
+  roundsSelect.addEventListener('change', () => {
+    maxRounds = Number(roundsSelect.value);
+    winNeed = Math.floor(maxRounds / 2) + 1;
+    roundMaxEl.textContent = String(maxRounds);
+    resetAll();
+  });
+
+  document.addEventListener('fullscreenchange', () => {
+    if(!document.fullscreenElement){
+      document.body.classList.remove('fullscreen');
+      btnFullscreen.textContent = '投影全螢幕 (F)';
+    }
+  });
+
+  document.addEventListener('keydown', (e) => {
+    const key = e.key.toLowerCase();
+
+    if(key === 'f'){ e.preventDefault(); toggleFullscreen(); return; }
+    if(key === 'r'){ e.preventDefault(); resetRound(); return; }
+
+    if(key === 'escape' && champScreen.classList.contains('show')){ hideChampion(); return; }
+
+    if(key === 'enter' || key === ' ' || key === 'pagedown' || key === 'pageup'){
+      e.preventDefault();
+      drawBothSuspense();
+      return;
+    }
+  });
+
+  // ---------- Init ----------
+  syncLabels();
+  syncTeamColors();
+  syncRoundUI();
+  setScoreVisualState('faded');
+  setStatus('準備開始！按「春節比大小」', '');
+})();
+</script>
+</body>
+</html>
